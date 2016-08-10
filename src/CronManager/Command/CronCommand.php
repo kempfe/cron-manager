@@ -13,6 +13,7 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -75,7 +76,6 @@ class CronCommand extends ContainerAwareCommand{
 
             $intervalDate = new \DateTime();
             $intervalDate->modify(sprintf("-%s seconds",$input->getOption("interval")));
-            var_dump($intervalDate);
 
             if($expression->getNextRunDate($intervalDate) <= new \DateTime()) {
                 $output->write(sprintf("CRON : %s - Executing...",$cron->getId()));
@@ -87,15 +87,13 @@ class CronCommand extends ContainerAwareCommand{
                 try {
                     $command = $this->getApplication()->find($cron->getCommand());
                     $arguments = array_merge(['command' => $cron->getCommand()],$cron->getArguments());
-                    $response = new ConsoleOutput();
+                    $response = new BufferedOutput();
 
                     $hasError = false;
                     try {
                         $returnCode = $command->run(new ArrayInput($arguments), $response);
-                        if ($returnCode != 0) {
-                            $log = json_decode(rtrim($response));
+                        $log = rtrim($response->fetch());
 
-                        }
                     }catch(\Exception $e){
                         $log = $e->getMessage();
                         $hasError = true;
@@ -105,7 +103,9 @@ class CronCommand extends ContainerAwareCommand{
                     $logEntry = new Log();
                     $logEntry->setCron($cron);
                     $logEntry->setLog($log);
-
+                    $logEntry->setHasError($hasError);
+                    $this->getEntityManager()->persist($logEntry);
+                    $this->getEntityManager()->flush();
                     $output->writeln(sprintf("done", $cron->getId()));
                 }catch(CommandNotFoundException $e){
                     $output->writeln(sprintf("Command \"%s\" not found",$cron->getCommand()));
