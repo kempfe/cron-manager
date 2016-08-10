@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xsi="http://www.w3.org/2001/XMLSchema-instance" schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+  <entity name="CronManager\Entity\Cron" table="cm_cron">
+    <id name="id" type="integer">
+      <generator strategy="AUTO"/>
+    </id>
+    <field name="name" type="string" nullable="true"/>
+    <field name="expression" type="string" nullable="true"/>
+    <field name="command" type="string" nullable="true"/>
+    <field name="arguments" type="json_array" nullable="true"/>
+    <field name="lastExecution" type="datetime" nullable="true"/>
+    <field name="nextExecution" type="datetime" nullable="true"/>
+    <field name="active" type="boolean" nullable="true"/>
+    <field name="processId" type="integer" nullable="true"/>
+    <one-to-many field="log" target-entity="CronManager\Entity\Log" mapped-by="cron"/>
+  </entity>
+</doctrine-mapping>

@@ -1,0 +1,16 @@
+{
+    "name": "mkempf/cron-manager",
+    "description": "Cron Manager for Symfony3",
+    "type": "library",
+    "require": {
+        "mtdowling/cron-expression": "^1.1"
+    },
+    "license": "GNU",
+    "authors": [
+        {
+            "name": "Mario Kempf",
+            "email": "mario.kempf@logmedia.at"
+        }
+    ],
+    "minimum-stability": "stable"
+}
