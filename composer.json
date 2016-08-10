@@ -2,6 +2,7 @@
     "name": "kempfe/cron-manager",
     "description": "Cron Manager for Symfony3",
     "type": "library",
+    "keywords": ["cron", "schedule","manager"],
     "require": {
         "php": ">=5.5.9",
         "symfony/symfony": "3.0.*",
@@ -15,6 +16,6 @@
             "name": "Mario Kempf",
             "email": "mario.kempf@logmedia.at"
         }
-    ],
-    "minimum-stability": "stable"
+    ]
+
 }
