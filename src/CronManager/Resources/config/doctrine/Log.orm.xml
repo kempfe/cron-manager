@@ -9,7 +9,7 @@
     <field name="hasError" type="boolean" nullable="true"/>
     <many-to-one field="cron" target-entity="CronManager\Entity\Cron" inversed-by="log">
       <join-columns>
-        <join-column name="cron_id" referenced-column-name="id" nullable="false"/>
+        <join-column name="cron_id" referenced-column-name="id" nullable="false" on-delete="CASCADE"/>
       </join-columns>
     </many-to-one>
   </entity>
