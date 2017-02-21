@@ -95,6 +95,7 @@ class CronCommand extends ContainerAwareCommand{
                         $log = rtrim($response->fetch());
 
                     }catch(\Exception $e){
+                        $log = rtrim($response->fetch());
                         $log = $e->getMessage();
                         $hasError = true;
                     }
