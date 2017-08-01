@@ -54,7 +54,6 @@ class CronCommand extends ContainerAwareCommand{
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $interval = (int) $input->getOption("interval");
 
         /* @var $crons Cron[] */
         $crons = $this->getEntityManager()->getRepository("CronManager\Entity\Cron")->findBy([
@@ -63,6 +62,7 @@ class CronCommand extends ContainerAwareCommand{
 
 
         foreach($crons as $cron){
+            $cron = $this->getEntityManager()->merge($cron);
             // Check if Cron is stil running
             if($input->getOption("processCheck")){
                 if($cron->getProcessId() && file_exists(sprintf("/proc/%s",$cron->getProcessId()))){
@@ -84,6 +84,8 @@ class CronCommand extends ContainerAwareCommand{
                 $cron->setNextExecution($expression->getNextRunDate());
                 $this->getEntityManager()->persist($cron);
                 $this->getEntityManager()->flush();
+
+
                 try {
                     $command = $this->getApplication()->find($cron->getCommand());
                     $arguments = array_merge(['command' => $cron->getCommand()],$cron->getArguments());
@@ -91,7 +93,7 @@ class CronCommand extends ContainerAwareCommand{
 
                     $hasError = false;
                     try {
-                        $returnCode = $command->run(new ArrayInput($arguments), $response);
+                        $command->run(new ArrayInput($arguments), $response);
                         $log = rtrim($response->fetch());
 
                     }catch(\Exception $e){
@@ -99,6 +101,8 @@ class CronCommand extends ContainerAwareCommand{
                         $log .= $e->getMessage();
                         $hasError = true;
                     }
+
+                    $cron = $this->getEntityManager()->merge($cron);
 
                     // Create Logfile
                     $logEntry = new Log();
